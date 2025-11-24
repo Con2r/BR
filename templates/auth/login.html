@@ -1,78 +1,63 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - Школа Робототехники</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container-fluid vh-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-robot text-primary" style="font-size: 3rem;"></i>
+                            <h2 class="card-title mt-3">Школа Робототехники</h2>
+                            <p class="text-muted">Вход в систему управления</p>
+                        </div>
 
-{% block title %}Вход - Brainrot Academy{% endblock %}
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-header bg-primary text-white text-center">
-                <h4 class="card-title mb-0">
-                    <i class="fas fa-sign-in-alt"></i> Вход в систему
-                </h4>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    {{ form.csrf_token }}
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Логин или Email</label>
-                        <input type="text" class="form-control" id="username" name="username" 
-                               value="{{ form.username.data or '' }}" required>
-                        {% if form.username.errors %}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.username.errors %}
-                            {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        {% if form.password.errors %}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.password.errors %}
-                            {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt"></i> Войти
-                        </button>
-                    </div>
-                </form>
-                
-                <div class="mt-4 text-center">
-                    <p class="text-muted">Демо доступы:</p>
-                    <div class="row">
-                        <div class="col-6">
-                            <strong>Администратор:</strong><br>
-                            Логин: <code>admin</code><br>
-                            Пароль: <code>admin</code>
-                        </div>
-                        <div class="col-6">
-                            <strong>Ученик:</strong><br>
-                            Логин: <code>student@example.com</code><br>
-                            Пароль: <code>student123</code>
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Имя пользователя</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Пароль</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Войти
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                По умолчанию: admin / admin123
+                            </small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card mt-3">
-            <div class="card-body text-center">
-                <p class="mb-0">
-                    Нет аккаунта? 
-                    <a href="#" class="text-info">Обратитесь к администратору</a>
-                </p>
-            </div>
-        </div>
     </div>
-</div>
-{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
