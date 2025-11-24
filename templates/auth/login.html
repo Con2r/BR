@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - Brainrot Academy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-sign-in-alt"></i> Вход в систему
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Логин или Email</label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               value="{{ form.username.data or '' }}" required>
+                        {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.username.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <p class="text-muted">Демо доступы:</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Администратор:</strong><br>
+                            Логин: <code>admin</code><br>
+                            Пароль: <code>admin</code>
+                        </div>
+                        <div class="col-6">
+                            <strong>Ученик:</strong><br>
+                            Логин: <code>student@example.com</code><br>
+                            Пароль: <code>student123</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body text-center">
+                <p class="mb-0">
+                    Нет аккаунта? 
+                    <a href="#" class="text-info">Обратитесь к администратору</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

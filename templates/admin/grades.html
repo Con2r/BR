@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Управление оценками - Brainrot Academy{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-star"></i> Управление оценками</h1>
+        <p class="text-muted">Выставление оценок за задания и поведение</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Выставить оценку</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    <div class="mb-3">
+                        {{ form.student_id.label(class="form-label") }}
+                        {{ form.student_id(class="form-select") }}
+                        {% if form.student_id.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.student_id.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.lesson_date.label(class="form-label") }}
+                        {{ form.lesson_date(class="form-control", type="date") }}
+                        {% if form.lesson_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.lesson_date.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.task_grade.label(class="form-label") }}
+                                {{ form.task_grade(class="form-select") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.behavior_grade.label(class="form-label") }}
+                                {{ form.behavior_grade(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows="3", placeholder="Комментарии, заметки...") }}
+                    </div>
+                    <button type="submit" class="btn btn-info w-100">Сохранить оценку</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-secondary text-light">
+                <h5 class="card-title mb-0">История оценок</h5>
+            </div>
+            <div class="card-body">
+                {% if grades %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Ученик</th>
+                                <th>Задание</th>
+                                <th>Поведение</th>
+                                <th>Заметки</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in grades %}
+                            <tr>
+                                <td>{{ grade.lesson_date.strftime('%d.%m.%Y') }}</td>
+                                <td>{{ grade.student.first_name }} {{ grade.student.last_name }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if grade.task_grade >= 4 else 'warning' if grade.task_grade == 3 else 'danger' }} fs-6">
+                                        {{ grade.task_grade }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if grade.behavior_grade >= 4 else 'warning' if grade.behavior_grade == 3 else 'danger' }} fs-6">
+                                        {{ grade.behavior_grade }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if grade.notes %}
+                                    <span class="d-inline-block text-truncate" style="max-width: 150px;" title="{{ grade.notes }}">
+                                        {{ grade.notes }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-warning" title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Нет выставленных оценок</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

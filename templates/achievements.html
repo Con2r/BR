@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Достижения - RoboAcademy{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-trophy"></i> Система достижений</h1>
+        <p class="text-muted">Зарабатывайте достижения за ваши успехи в робототехнике</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">Все достижения</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for achievement in all_achievements %}
+                    {% set earned = achievement.id in earned_achievement_ids %}
+                    <div class="col-md-6 mb-4">
+                        <div class="achievement-card {% if earned %}earned{% else %}locked{% endif %}">
+                            <div class="card h-100 {% if earned %}border-warning{% else %}border-secondary{% endif %}">
+                                <div class="card-body text-center">
+                                    <div class="achievement-icon display-1 mb-3 {% if not earned %}text-muted{% endif %}">
+                                        {{ achievement.icon }}
+                                    </div>
+                                    <h5 class="card-title">{{ achievement.name }}</h5>
+                                    <p class="card-text">{{ achievement.description }}</p>
+                                    <div class="achievement-reward">
+                                        <span class="badge bg-success">+{{ achievement.points_reward }} XP</span>
+                                        {% if achievement.is_secret %}
+                                        <span class="badge bg-danger ms-1">Секрет</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="achievement-status mt-3">
+                                        {% if earned %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Получено
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-lock"></i> Не получено
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-pie"></i> Статистика</h5>
+            </div>
+            <div class="card-body">
+                {% set total_achievements = all_achievements|length %}
+                {% set earned_count = earned_achievement_ids|length %}
+                {% set progress_percentage = (earned_count / total_achievements * 100)|round %}
+                
+                <div class="text-center mb-4">
+                    <h2>{{ earned_count }}/{{ total_achievements }}</h2>
+                    <p class="text-muted">Достижений получено</p>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-success" style="width: {{ progress_percentage }}%">
+                            {{ progress_percentage }}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-list">
+                    <div class="stat-item d-flex justify-content-between mb-2">
+                        <span>Всего XP за достижения:</span>
+                        <strong>{{ student.experience_points }}</strong>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between mb-2">
+                        <span>Уровень:</span>
+                        <strong>{{ student.level }}</strong>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between mb-2">
+                        <span>Выполнено миссий:</span>
+                        <strong>{{ student.progress|selectattr('completed')|list|length }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-lightbulb"></i> Советы</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <i class="fas fa-robot text-success me-2"></i>
+                        <strong>Завершайте миссии</strong>
+                        <p class="text-muted small mb-0">Каждая миссия приносит очки опыта и приближает к новым достижениям</p>
+                    </li>
+                    <li class="mb-3">
+                        <i class="fas fa-code text-warning me-2"></i>
+                        <strong>Решайте задачи</strong>
+                        <p class="text-muted small mb-0">Программистские челленджи помогают получить специальные достижения</p>
+                    </li>
+                    <li class="mb-0">
+                        <i class="fas fa-star text-danger me-2"></i>
+                        <strong>Ищите секреты</strong>
+                        <p class="text-muted small mb-0">Некоторые достижения скрыты - проявляйте любопытство!</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.achievement-card.earned .achievement-icon {
+    animation: bounce 0.5s;
+}
+
+.achievement-card.locked {
+    opacity: 0.7;
+}
+
+.achievement-card.locked .card {
+    background-color: #2a2d32;
+}
+
+@keyframes bounce {
+    0%, 20%, 60%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    80% {
+        transform: translateY(-5px);
+    }
+}
+
+.stat-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #444;
+}
+</style>
+{% endblock %}  

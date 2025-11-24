@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Дашборд - RoboAcademy{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-tachometer-alt"></i> Персональный дашборд</h1>
+            {% if student %}
+            <div class="progress-stats">
+                <span class="badge bg-success fs-6">Уровень {{ student.level }}</span>
+                <span class="badge bg-primary fs-6 ms-2">{{ student.experience_points }} XP</span>
+                <span class="badge bg-info fs-6 ms-2">Выполнено: {{ completed_levels|length }}/{{ missions|length }}</span>
+            </div>
+            {% endif %}
+        </div>
+        <p class="text-muted">Добро пожаловать в мир робототехники, {{ student.first_name }}!</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Статистика прогресса -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-bar"></i> Ваш прогресс</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         style="width: {{ (completed_levels|length / missions|length * 100) }}%">
+                        {{ (completed_levels|length / missions|length * 100)|round|int }}%
+                    </div>
+                </div>
+                <p class="card-text">Пройдено миссий: <strong>{{ completed_levels|length }}</strong> из <strong>{{ missions|length }}</strong></p>
+                <p class="card-text">Текущая миссия: <strong>{{ current_level }}</strong></p>
+                <p class="card-text">Очки опыта: <strong>{{ student.experience_points }}</strong></p>
+                
+                {% if completed_levels|length == missions|length %}
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-trophy"></i> Поздравляем! Вы завершили все миссии!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Достижения -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0"><i class="fas fa-trophy"></i> Ваши достижения</h5>
+            </div>
+            <div class="card-body">
+                {% if student_achievements %}
+                <div class="achievements-grid">
+                    {% for sa in student_achievements[:6] %}
+                    <div class="achievement-item text-center mb-3">
+                        <div class="achievement-icon display-6">{{ sa.achievement.icon }}</div>
+                        <div class="achievement-info">
+                            <strong class="d-block">{{ sa.achievement.name }}</strong>
+                            <small class="text-muted">{{ sa.achievement.description }}</small>
+                            <br>
+                            <small class="text-success">+{{ sa.achievement.points_reward }} XP</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-muted">У вас пока нет достижений</p>
+                {% endif %}
+                
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('achievements_page') }}" class="btn btn-outline-warning btn-sm">
+                        Все достижения
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Быстрые действия -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-bolt"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('mission_detail', level=current_level) }}" class="btn btn-primary">
+                        <i class="fas fa-play-circle"></i> Продолжить обучение
+                    </a>
+                    <a href="{{ url_for('achievements_page') }}" class="btn btn-warning">
+                        <i class="fas fa-trophy"></i> Мои достижения
+                    </a>
+                    <button class="btn btn-info" onclick="requestMentor({{ student.id }})">
+                        <i class="fas fa-user-graduate"></i> Найти ментора
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Прогресс по достижениям -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-star"></i> Прогресс достижений</h5>
+            </div>
+            <div class="card-body">
+                {% for achievement in all_achievements if not achievement.is_secret %}
+                {% set earned = achievement.id in [sa.achievement_id for sa in student_achievements] %}
+                <div class="achievement-progress mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="me-2">{{ achievement.icon }}</span>
+                            <strong>{{ achievement.name }}</strong>
+                            <small class="text-muted d-block">{{ achievement.description }}</small>
+                        </div>
+                        <div>
+                            {% if earned %}
+                            <span class="badge bg-success">Получено</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Не получено</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if not earned %}
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Последний прогресс -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-history"></i> История миссий</h5>
+            </div>
+            <div class="card-body">
+                {% if completed_levels %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Миссия</th>
+                                <th>Название</th>
+                                <th>Очки</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for level in completed_levels[-5:] %}
+                            {% set mission = missions[level-1] %}
+                            {% set progress = student.progress|selectattr('mission_id', 'equalto', mission.id)|first %}
+                            <tr>
+                                <td>{{ level }}</td>
+                                <td>{{ mission.title }}</td>
+                                <td><span class="badge bg-success">+{{ progress.score }} XP</span></td>
+                                <td>{{ progress.completed_at.strftime('%d.%m.%Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted">У вас пока нет завершенных миссий</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function requestMentor(studentId) {
+    fetch('/api/mentor/request', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({student_id: studentId})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        alert('Ошибка при запросе ментора');
+    });
+}
+</script>
+
+<style>
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.achievement-item {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #2d3035;
+}
+.achievement-progress {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #2d3035;
+}
+</style>
+{% endblock %}

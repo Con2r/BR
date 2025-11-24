@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель - Brainrot Academy{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-cogs"></i> Админ-панель</h1>
+        <p class="text-muted">Управление учебным процессом и мониторинг системы</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Статистика -->
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ stats.students_count }}</h4>
+                        <p class="card-text">Учеников</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ stats.groups_count }}</h4>
+                        <p class="card-text">Групп</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-layer-group fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ stats.brainrots_count }}</h4>
+                        <p class="card-text">Уровней</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-brain fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ stats.recent_grades|length }}</h4>
+                        <p class="card-text">Новых оценок</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-star fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Быстрое меню -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-dark text-light">
+                <h5 class="card-title mb-0"><i class="fas fa-rocket"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{{ url_for('admin_students') }}" class="btn btn-outline-primary w-100 h-100 py-3">
+                            <i class="fas fa-user-plus fa-2x mb-2"></i><br>
+                            Добавить ученика
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ url_for('admin_groups') }}" class="btn btn-outline-success w-100 h-100 py-3">
+                            <i class="fas fa-users fa-2x mb-2"></i><br>
+                            Управление группами
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ url_for('admin_grades') }}" class="btn btn-outline-info w-100 h-100 py-3">
+                            <i class="fas fa-star fa-2x mb-2"></i><br>
+                            Выставить оценки
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-outline-warning w-100 h-100 py-3">
+                            <i class="fas fa-chart-line fa-2x mb-2"></i><br>
+                            Аналитика
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние оценки -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-light">
+                <h5 class="card-title mb-0"><i class="fas fa-history"></i> Последние оценки</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_grades %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-dark">
+                        <thead>
+                            <tr>
+                                <th>Ученик</th>
+                                <th>Задание</th>
+                                <th>Поведение</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in stats.recent_grades %}
+                            <tr>
+                                <td>{{ grade.student.first_name }} {{ grade.student.last_name }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if grade.task_grade >= 4 else 'warning' if grade.task_grade == 3 else 'danger' }}">
+                                        {{ grade.task_grade }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if grade.behavior_grade >= 4 else 'warning' if grade.behavior_grade == 3 else 'danger' }}">
+                                        {{ grade.behavior_grade }}
+                                    </span>
+                                </td>
+                                <td>{{ grade.lesson_date.strftime('%d.%m.%Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted">Нет recent оценок</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Системная информация -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-dark">
+                <h5 class="card-title mb-0"><i class="fas fa-info-circle"></i> Системная информация</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>Версия системы</h6>
+                        <p class="text-muted">Brainrot Academy v2.0</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Статус системы</h6>
+                        <p>
+                            <span class="badge bg-success">Активна</span>
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>База данных</h6>
+                        <p class="text-muted">SQLite</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
